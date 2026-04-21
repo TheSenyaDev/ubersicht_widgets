@@ -6,6 +6,7 @@ Display and edit notes from your Obsidian vault directly on your macOS desktop u
 
 - Browse your vault's folder tree and pin any note to a floating panel
 - Rendered markdown with support for headings, tables, task lists, code blocks, callouts, tags, and wikilinks
+- Interactive checkboxes — click to check/uncheck and the change is saved directly to the `.md` file
 - Inline editing — save changes back to the `.md` file without leaving your desktop
 - Multiple panels — pin different notes side by side
 - Drag to reposition and resize each panel independently
@@ -43,6 +44,7 @@ brew install pandoc
 |---|---|
 | Browse vault | Click the menu (⋮) → **Change note** |
 | Pin a note | Click any file in the browser |
+| Toggle a checkbox | Click any `- [ ]` / `- [x]` item — saves to the file immediately |
 | Edit a note | Click the pencil icon in the panel header |
 | Open in Obsidian | Click the menu (⋮) → **Open in Obsidian** |
 | Reposition | Click the menu (⋮) → **Reposition**, then drag the header |

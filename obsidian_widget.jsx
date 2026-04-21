@@ -75,6 +75,19 @@ function saveFile(filepath, content) {
   return run("echo '" + enc + "' | base64 -D > '" + s + "'");
 }
 
+function toggleCheckbox(filepath, index) {
+  return loadRaw(filepath).then(function(raw) {
+    var count = 0;
+    var updated = raw.replace(/^(\s*[-*+] \[)([xX ]?)(\])/gm, function(_, pre, state, post) {
+      if (count++ === index) {
+        return pre + (state === ' ' ? 'x' : ' ') + post;
+      }
+      return pre + state + post;
+    });
+    return saveFile(filepath, updated);
+  });
+}
+
 function postProcessHtml(html) {
   html = html.replace(
     /<blockquote>\s*<p>\[!(\w+)\]\s*(.*?)<\/p>([\s\S]*?)<\/blockquote>/gi,
@@ -103,6 +116,11 @@ function postProcessHtml(html) {
   );
   html = html.replace(/(^|[\s>])#([a-zA-Z0-9_/-]+)/g, function(_, before, tag) {
     return before + '<span class="obs-tag">#' + tag + '</span>';
+  });
+  var cbIdx = 0;
+  html = html.replace(/<input type="checkbox"([^>]*?)>/gi, function(_, attrs) {
+    var cleanAttrs = attrs.replace(/\s*disabled/gi, '').replace(/\s*\/$/, '');
+    return '<input type="checkbox"' + cleanAttrs + ' data-cb-index="' + (cbIdx++) + '">';
   });
   return html;
 }
@@ -678,6 +696,17 @@ function Panel(props) {
     contentArea = React.createElement("div", {
       className: "ws",
       style: { flex: 1, overflowY: "auto", padding: "10px 16px 16px 16px" },
+      onClick: function(e) {
+        if (e.target.type === "checkbox" && panel.pin) {
+          e.preventDefault();
+          var idx = parseInt(e.target.getAttribute("data-cb-index"), 10);
+          if (!isNaN(idx)) {
+            toggleCheckbox(panel.pin, idx).then(function() {
+              loadHtml(panel.pin).then(function(html) { setContent(postProcessHtml(html)); });
+            });
+          }
+        }
+      },
     },
       React.createElement("div", { className: "nc", dangerouslySetInnerHTML: { __html: content } })
     );
